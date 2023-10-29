@@ -7,7 +7,7 @@ import React, { useState } from "react";
 export default function Home() {
     const { Canvas } = useQRCode();
 
-    const [text, setText] = useState("test");
+    const [text, setText] = useState("https://arweb.dev");
 
     const handleChange = (event: {
         target: { value: React.SetStateAction<string> };
@@ -42,8 +42,8 @@ export default function Home() {
                         scale: 3,
                         width: 500,
                         color: {
-                            dark: "#000",
-                            light: "#fff",
+                            dark: "#fff",
+                            light: "#000",
                         },
                     }}
                 />
