@@ -1,18 +1,35 @@
 "use client";
 
-import Image from "next/image";
 import { useQRCode } from "next-qrcode";
 import React, { useState } from "react";
 
 export default function Home() {
-    const { Canvas } = useQRCode();
-
+    const { Image } = useQRCode();
     const [text, setText] = useState("https://arweb.dev");
 
     const handleChange = (event: {
         target: { value: React.SetStateAction<string> };
     }) => {
         setText(event.target.value);
+    };
+
+    const handleCopyImg = async () => {
+        const qrCodeContainer = document.getElementById("qrcode");
+        if (qrCodeContainer) {
+            const qrCodeImage = qrCodeContainer.querySelector("img");
+            if (qrCodeImage) {
+                try {
+                    const blob = await fetch(qrCodeImage.src).then((response) =>
+                        response.blob()
+                    );
+                    const item = new ClipboardItem({ "image/png": blob });
+                    await navigator.clipboard.write([item]);
+                    alert("Image copied to clipboard!");
+                } catch (error) {
+                    console.error("Failed to copy image to clipboard:", error);
+                }
+            }
+        }
     };
 
     return (
@@ -34,22 +51,26 @@ export default function Home() {
             </div>
 
             <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-                <Canvas
-                    text={text}
-                    options={{
-                        errorCorrectionLevel: "M",
-                        margin: 2,
-                        scale: 3,
-                        width: 500,
-                        color: {
-                            dark: "#fff",
-                            light: "#000",
-                        },
-                    }}
-                />
+                <div id="qrcode">
+                    <Image
+                        text={text || "https://arweb.dev"}
+                        options={{
+                            type: "image/png",
+                            quality: 0.3,
+                            errorCorrectionLevel: "M",
+                            margin: 2,
+                            scale: 4,
+                            width: 500,
+                            color: {
+                                dark: "#fff",
+                                light: "#000",
+                            },
+                        }}
+                    />
+                </div>
             </div>
 
-            <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left ">
+            <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-2 lg:text-left">
                 <a
                     className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
                     target="_blank"
@@ -58,7 +79,7 @@ export default function Home() {
                     <h2 className={`mb-3 text-2xl font-semibold`}>
                         <form>
                             <label>
-                                URL:
+                                URL:{" "}
                                 <input
                                     className="text-black"
                                     type="text"
@@ -70,6 +91,22 @@ export default function Home() {
                     </h2>
                     <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
                         the destination for the QR code
+                    </p>
+                </a>
+                <a
+                    className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30 cursor-pointer"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleCopyImg}
+                >
+                    <h2 className={`mb-3 text-2xl font-semibold`}>
+                        save image{" "}
+                        <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
+                            -&gt;
+                        </span>
+                    </h2>
+                    <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
+                        to clipboard
                     </p>
                 </a>
             </div>
